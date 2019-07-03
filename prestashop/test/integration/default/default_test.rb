@@ -5,8 +5,9 @@
 # The Inspec reference, with examples and extensive documentation, can be
 # found at http://inspec.io/docs/reference/resources/
 
-# check whether Docker daemon is running
+title "sample section"
 
+# check whether Docker daemon is running
 describe docker.info do
   its('Containers') { should eq '1' }
 end

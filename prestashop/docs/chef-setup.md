@@ -4,107 +4,124 @@ wget https://packages.chef.io/files/stable/chefdk/3.2.30/ubuntu/18.04/chefdk_3.2
 # Install
 sudo dpkg -i chefdk_3.2.30-1_amd64.deb
 
-# (Quick test) Generate a cookbook
-chef generate cookbook test_cookbook
+# (Quick test) 
+  #Generate a cookbook
+  chef generate cookbook test_cookbook
 
-nano recipes/default.rb
+  nano recipes/default.rb
 
-# content
-file "#{ENV['HOME']}/test.txt" do
-    content 'This file was created by Chef!'
-end
+    # content
+    file "#{ENV['HOME']}/test.txt" do
+        content 'This file was created by Chef!'
+    end
 
-chef-client --local-mode --override-runlist first_cookbook
-# I need config file...
+  # Launch chef
+  chef-client --local-mode --override-runlist first_cookbook
+  # I need config file...
 
-# From the beginning: Create chef-repo (it is the area of the workstation where cookbooks are maintained)
+# From the beginning: 
+  # Create chef-repo (it is the area of the workstation where cookbooks are maintained)
 
-chef generate repo chef-repo
-cd chef-repo
-mkdir .chef
+  chef generate repo chef-repo
+  cd chef-repo
+  mkdir .chef
 
-nano .chef/config.rb
+  nano .chef/config.rb
 
-# Content:
-current_dir = File.dirname(__FILE__)
-log_level                :info
-log_location             STDOUT
-node_name                'ingram'
-client_key               "#{current_dir}/ignacio.pem"
-validation_client_name   'ingram-validator'
-validation_key           "#{current_dir}/ORGANIZATION-validator.pem"
-chef_server_url          'https://api.chef.io/organizations/ORG_NAME'
-cache_type               'BasicFile'
-cache_options( :path => "#{ENV['HOME']}/.chef/checksums" )
-cookbook_path            ["#{current_dir}/../cookbooks"]
+    # Content:
+    current_dir = File.dirname(__FILE__)
+    log_level                :info
+    log_location             STDOUT
+    node_name                'ingram'
+    client_key               "#{current_dir}/ignacio.pem"
+    validation_client_name   'ingram-validator'
+    validation_key           "#{current_dir}/ORGANIZATION-validator.pem"
+    chef_server_url          'https://api.chef.io/organizations/ORG_NAME'
+    cache_type               'BasicFile'
+    cache_options( :path => "#{ENV['HOME']}/.chef/checksums" )
+    cookbook_path            ["#{current_dir}/../cookbooks"]
 
-# test default example
-chef-client --local-mode --override-runlist example
+  # test default example
+  chef-client --local-mode --override-runlist example
 
-# Print from stdout this message: INFO: Welcome to Chef, Sam Doe!
+  # Print from stdout this message: INFO: Welcome to Chef, Sam Doe!
 
-# I will modify default recipe file to try to write test.txt using chef...
-nano cookbooks/example/recipes/default.rb
+  # I will modify default recipe file to try to write test.txt using chef...
+  nano cookbooks/example/recipes/default.rb
 
-  # New content
-  log "Welcome to Chef, #{node['example']['name']}!" do
-    level :info
-  end
+    # New content
+    log "Welcome to Chef, #{node['example']['name']}!" do
+      level :info
+    end
 
-  file "#{ENV['HOME']}/test.txt" do
-      content 'This file was created by Chef!'
-  end
+    file "#{ENV['HOME']}/test.txt" do
+        content 'This file was created by Chef!'
+    end
 
-# Test
-chef-client --local-mode --override-runlist example
+  # Test
+  chef-client --local-mode --override-runlist example
 
-# And it works. This create a test.txt in my personal folder. So another success for the computer team.
-
-
+  # And it works. This create a test.txt in my personal folder. So another success for the computer team.
 
 # Now, i will test the chef docker module suggested
 
-# Download docker cookbook from chef supermarket
-knife cookbook site download docker
-# Install
-knife cookbook site install docker
+  # Download docker cookbook from chef supermarket
+  knife cookbook site download docker
+  # Install
+  knife cookbook site install docker
 
-# Add dependency to cookbook's example metadata.rb file
-gedit cookbooks/example/metadata.rb &
+  # Add dependency to cookbook's example metadata.rb file
+  gedit cookbooks/example/metadata.rb &
 
-  # New content
-  depends 'docker'
+    # New content
+    depends 'docker'
 
-# Add test to recipe
-gedit cookbooks/example/recipes/default.rb &
+  # Add test to recipe
+  gedit cookbooks/example/recipes/default.rb &
 
-  # New content
-  docker_installation 'default' 
+    # New content
+    docker_installation 'default' 
 
-# Launch chef
-chef-client --local-mode --override-runlist example
+  # Launch chef
+  chef-client --local-mode --override-runlist example
 
-# And it works
+  # And it works
 
 # Second test
-# Add new content to recipe
+  # Add new content to recipe
 
-  # New content
-  docker_image 'prestashop/prestashop' do
-    action :pull
-  end
+    # New content
+    docker_image 'prestashop/prestashop' do
+      action :pull
+    end
 
-  docker_container 'prestashop' do
-    repo 'prestashop/prestashop'
-    port '8080:80'
-    action :run
-  end
+    docker_container 'prestashop' do
+      repo 'prestashop/prestashop'
+      port '8080:80'
+      action :run
+    end
 
-# Launch chef
-chef-client --local-mode --override-runlist example
+  # Launch chef
+  chef-client --local-mode --override-runlist example
 
 # Using testing tool...
 
+  # Install Inspec
+  wget https://packages.chef.io/files/stable/inspec/4.6.9/ubuntu/18.04/inspec_4.6.9-1_amd64.deb
+
+  sudo dpkg -i inspec_4.6.9-1_amd64.deb
+
+  inspec help   # success
+
+  inspec detect   # accept license
+
+  inspec init profile ingram_test   # this create an inspec profile
+
+  # Launch the example test
+  inspect exec controls/example.rb
+
+  # I take a look at controls directory that contains inspect tests
+  
 
 
 ##################################################################

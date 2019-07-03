@@ -1,3 +1,6 @@
+log "Testing Docker Chef module. #{node['example']['name']}!" do
+  level :info
+end
 
 # Install Docker in the machine with Chef-Docker cookbook resources mentioned earlier
 docker_installation 'default'
