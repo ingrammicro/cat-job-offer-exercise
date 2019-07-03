@@ -46,14 +46,14 @@ chef-client --local-mode --override-runlist example
 # I will modify default recipe file to try to write test.txt using chef...
 nano cookbooks/example/recipes/default.rb
 
-# New content
-log "Welcome to Chef, #{node['example']['name']}!" do
-  level :info
-end
+  # New content
+  log "Welcome to Chef, #{node['example']['name']}!" do
+    level :info
+  end
 
-file "#{ENV['HOME']}/test.txt" do
-    content 'This file was created by Chef!'
-end
+  file "#{ENV['HOME']}/test.txt" do
+      content 'This file was created by Chef!'
+  end
 
 # Test
 chef-client --local-mode --override-runlist example
@@ -62,6 +62,52 @@ chef-client --local-mode --override-runlist example
 
 
 
+# Now, i will test the chef docker module suggested
+
+# Download docker cookbook from chef supermarket
+knife cookbook site download docker
+# Install
+knife cookbook site install docker
+
+# Add dependency to cookbook's example metadata.rb file
+gedit cookbooks/example/metadata.rb &
+
+  # New content
+  depends 'docker'
+
+# Add test to recipe
+gedit cookbooks/example/recipes/default.rb &
+
+  # New content
+  docker_installation 'default' 
+
+# Launch chef
+chef-client --local-mode --override-runlist example
+
+# And it works
+
+# Second test
+# Add new content to recipe
+
+  # New content
+  docker_image 'prestashop/prestashop' do
+    action :pull
+  end
+
+  docker_container 'prestashop' do
+    repo 'prestashop/prestashop'
+    port '8080:80'
+    action :run
+  end
+
+# Launch chef
+chef-client --local-mode --override-runlist example
+
+# Using testing tool...
+
+
+
+##################################################################
 # TODO: Learn about knife cli
 
 # Knife CLI is an interface to manage nodes, cookbooks, roles...

@@ -21,3 +21,6 @@ sudo dpkg -i vagrant_2.2.5_x86_64.deb
 vagrant --version   # version 2.2.5
 
 vagrant up --provider virtualbox    # now it works
+
+vagrant halt
+
