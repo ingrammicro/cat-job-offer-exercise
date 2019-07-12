@@ -4,3 +4,7 @@
 
 # The Inspec reference, with examples and extensive documentation, can be
 # found at http://inspec.io/docs/reference/resources/
+
+describe docker_container(name: 'my_prestashop') do
+    it { should exist }
+end
