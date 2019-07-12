@@ -8,3 +8,7 @@
 describe docker_container(name: 'my_prestashop') do
     it { should exist }
 end
+
+describe docker_container(name: 'my_prestashop') do
+    its('ports') {should eq '0.0.0.0:80->80/tcp'}
+end
